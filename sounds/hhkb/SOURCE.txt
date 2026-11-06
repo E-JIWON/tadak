@@ -1,0 +1,4 @@
+Source: "Keyboard Typing 7 (HHKB, Topre)" by grcekh
+https://freesound.org/people/grcekh/sounds/546164/
+License: Creative Commons 0 (public domain)
+Cut with TIGHT=0 SPLIT=bright MAX=24 tools/slice from the HQ mp3 preview (ref/): on Topre the press is the darker sound.

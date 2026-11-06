@@ -1,0 +1,21 @@
+Reference recordings, all Creative Commons 0 (public domain) on Freesound, saved as their HQ mp3 previews.
+Used to compare and tune the sounds; only the ones copied into sounds/ ship in the app.
+
+cherry-blue.mp3                 https://freesound.org/s/442260/  "Clicky Keyboard Fast Typing" by JonasTisell
+cherry-brown-at2035.mp3         https://freesound.org/s/618064/  "Typing On Keyboard (cherry mx browns)" by Seth_Makes_Sounds
+cherry-brown-k95.mp3            https://freesound.org/s/432432/  "Cherry MX Brown Mechanical Keyboard Sound.mp3" by NickTHH
+cherry-red-k95.mp3              https://freesound.org/s/499773/  "Keyboard clicking typing Cherry Red Mechanical" by handygaber
+creamy.mp3                      https://freesound.org/s/868632/  "Typing Sentences with a Creamy Keyboard" by adamlenhart
+gateron-baby-kangaroo.mp3       https://freesound.org/s/686168/  "Typing on Gateron Baby Kangaroo switches" by redpanda69
+glorious-panda.mp3              https://freesound.org/s/581070/  "Mechanical Keyboard" by quasifandango
+hhkb-topre.mp3                  https://freesound.org/s/546164/  "Keyboard Typing 7 (HHKB, Topre)" by grcekh
+kailh-box-jade.mp3              https://freesound.org/s/643558/  "Kailh Box Jade Switches Sound" by el_boss
+kailh-clickbar-blue.mp3         https://freesound.org/s/502653/  "Fast Typing on Mechanical Keyboard" by HeinzBBQ
+keychron-k10-enter.mp3          https://freesound.org/s/789629/  "Keychron k10 Enter" by Sadiquecat
+mouse-logitech-m330-silent.mp3  https://freesound.org/s/709133/  "Silent mouse clicking and scrolling sound" by lastraindrop
+mouse-logitech.mp3              https://freesound.org/s/583087/  "Mouse Click" by IRF1010N
+mouse-razer-deathadder.mp3      https://freesound.org/s/555394/  "mouse click (double click) - razer deathadder essential" by Katsuhira
+mx-brown-kinesis.mp3            https://freesound.org/s/249889/  "Kinesis Cherry MX Brown Typing.wav" by DarcyConroy
+rainy75.mp3                     https://freesound.org/s/815614/  "Typing on a rainy 75" by Techrul
+trackpad-macbook-pro.mp3        https://freesound.org/s/118206/  "Mac Book Pro Track Pad Click.aif" by MegaPenguin13
+ws-brown-lubed.mp3              https://freesound.org/s/709460/  "Mechanical keyboard typing sounds" by Reina0613

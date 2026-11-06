@@ -1,0 +1,10 @@
+# Built by build.sh
+Tadak.app/
+# Compiled tools (swiftc tools/<name>.swift -o tools/<name>)
+tools/*
+!tools/*.swift
+!tools/*.sh
+.DS_Store
+Tadak.zip
+# Working material from tuning; the app ships sounds/ only
+rec/
