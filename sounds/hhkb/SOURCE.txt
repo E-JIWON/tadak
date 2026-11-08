@@ -1,4 +1,7 @@
 Source: "Keyboard Typing 7 (HHKB, Topre)" by grcekh
 https://freesound.org/people/grcekh/sounds/546164/
 License: Creative Commons 0 (public domain)
-Cut with TIGHT=0 SPLIT=bright MAX=24 tools/slice from the HQ mp3 preview (ref/): on Topre the press is the darker sound.
+Cut with TIGHT=0 SPLIT=bright tools/slice from the HQ mp3 preview (ref/). The evenest strokes with the fewest
+rebounds were kept, then shaped with tools/shape.js using these settings from the tuner page:
+{"pitch":-50,"low":-4,"lowmid":3,"mid":4,"high":-8,"air":-10,"tick":8,"tail":9,"gate":-38,"rebound":3,"pre":8.5,"single":true,"even":90,"rel":-3}
+(pitch is applied in the app, as prepared("hhkb", cents: -50)).

@@ -4,6 +4,7 @@ Tadak.app/
 tools/*
 !tools/*.swift
 !tools/*.sh
+!tools/*.js
 .DS_Store
 Tadak.zip
 # Working material from tuning; the app ships sounds/ only

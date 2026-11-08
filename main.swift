@@ -91,16 +91,16 @@ func clips(_ folder: String, _ prefix: String, eq: [Biquad] = []) -> [[Double]] 
 }
 
 // The set is scaled from the presses' median loudness, and each clip's distance from its own set's median is
-// halved (in dB): natural variation stays, but no single keystroke jumps out. Each clip also gets copies
-// nudged ±50 cents, so repeats don't sound canned.
-func sounds(down: [[Double]], up: [[Double]], big: [[Double]], gain: Float = 1, cents: Double = 0) -> Sounds {
+// halved (in dB) by default (`even` 0.25; 0 keeps the clips' own levels): natural variation stays, but no single
+// keystroke jumps out. Each clip also gets copies nudged ±50 cents, so repeats don't sound canned.
+func sounds(down: [[Double]], up: [[Double]], big: [[Double]], gain: Float = 1, cents: Double = 0, even: Double = 0.25) -> Sounds {
     let median = { (clips: [[Double]]) in clips.map(audibleEnergy).sorted()[clips.count / 2] }
     guard !down.isEmpty else { return Sounds(down: [], up: [], space: [], enter: []) }
     let scale = (targetEnergy / median(down)).squareRoot() * Double(gain)
     let make = { (clips: [[Double]]) -> [AVAudioPCMBuffer] in
         let set = clips.isEmpty ? down : clips, mid = median(set)
         return set.flatMap { c in
-            let s = scale * pow(mid / audibleEnergy(c), 0.25)
+            let s = scale * pow(mid / audibleEnergy(c), even)
             return [-50.0, -25, 0, 25, 50].map { pcm(resample(c, cents: cents + $0), scale: s) }
         }
     }
@@ -127,6 +127,11 @@ func recorded(_ folder: String, gain: Float = 1, upGain: Double = 1, eq: [Biquad
         return xs
     }
     return sounds(down: load("down", 1), up: load("up", upGain), big: load("space", 1), gain: gain, cents: cents)
+}
+
+// Clips already finished elsewhere (tools/shape.js, from the tuner page): played as they are, only pitched and leveled.
+func prepared(_ folder: String, gain: Float = 1, cents: Double = 0) -> Sounds {
+    sounds(down: clips(folder, "down"), up: clips(folder, "up"), big: clips(folder, "space"), gain: gain, cents: cents, even: 0)
 }
 
 // A silent switch's dampers soften the impact itself: above 1.5 kHz the hit is `db` quieter up to 3 ms past its peak,
@@ -326,16 +331,12 @@ func switchIcon(housing: NSColor, stem: NSColor, _ kind: Stem, wall: NSColor? = 
     }
 }
 let rgb = { (r: CGFloat, g: CGFloat, b: CGFloat) in NSColor(srgbRed: r / 255, green: g / 255, blue: b / 255, alpha: 1) }
-// HHKB (Topre 45g): a recording of one with more of the 177–250 Hz thock and a little less around 500 Hz and 4 kHz, its
-// one-off 5.1 kHz ping notched and the 6.5 kHz ring boards like it share lifted, releases ~2 dB over the presses.
-let hhkbEQ = [Biquad(highpass: 100), Biquad(peak: 177, q: 2, db: 8), Biquad(peak: 250, q: 2, db: 4), Biquad(peak: 500, q: 2, db: -2),
-              Biquad(peak: 1000, q: 2, db: 2), Biquad(peak: 2828, q: 2, db: 1.5), Biquad(peak: 4000, q: 2, db: -2),
-              Biquad(peak: 5085, q: 8, db: -12), Biquad(peak: 6000, q: 3, db: 4), Biquad(peak: 6500, q: 16, db: 5)]
 let keyPresets = [
     Preset(name: "보글", detail: "레이니75 · 알루미늄", icon: switchIcon(housing: rgb(196, 160, 185), stem: rgb(176, 130, 181), .cross)) { recorded("rainy75", eq: rainyEQ, tight: 10) },
     Preset(name: "내 키보드", detail: "듀록 저소음 쉬림프 67g", icon: switchIcon(housing: rgb(90, 168, 163), stem: rgb(239, 240, 240), .cross)) { shrimp() },
     Preset(name: "해피해킹", detail: "HHKB · Topre 45g", icon: switchIcon(housing: rgb(217, 213, 204), stem: rgb(32, 32, 32), .topre)) {
-        recorded("hhkb", upGain: 1.1, eq: hhkbEQ, tight: 30)
+        // HHKB Topre 45g, shaped on the tuner page: the cushioned double impact and the case's ring trimmed, treble down.
+        prepared("hhkb", gain: 0.75, cents: -50)  // 0.75: presses stay under the peak cap, so releases keep their balance
     },
     // Kailh Arctic Fox (Chosfox): a Box click bar like the Box Jade, but with a PC bottom housing (the Jade's is nylon)
     // and a lighter 53 g spring, reviewed as louder and higher-pitched than the Jade, "crisp and hollow". So it's the
@@ -393,7 +394,12 @@ if CommandLine.arguments.contains("--check") {
 }
 
 let defaults = UserDefaults.standard
-var keyChoice = keyPresets.indices.contains(defaults.integer(forKey: "keySound")) ? defaults.integer(forKey: "keySound") : 0
+// The pick is saved by name, so adding sounds to the list later keeps it; version 1.0 saved only the index.
+var keyChoice: Int = {
+    if let name = defaults.string(forKey: "keySoundName"), let i = keyPresets.firstIndex(where: { $0.name == name }) { return i }
+    let i = defaults.integer(forKey: "keySound")
+    return keyPresets.indices.contains(i) ? i : 0
+}()
 var mouseChoice = min(defaults.object(forKey: "mouseSound") as? Int ?? 0, mousePresets.count - 1)  // -1 = off
 var keys = keyPresets[keyChoice].sounds()
 var mouse = mousePresets[max(0, mouseChoice)].sounds()
@@ -524,7 +530,7 @@ final class Panel: NSObject, ObservableObject {
 
     func pickKey(_ i: Int) {
         preview?.cancel(); key = i; keyChoice = i
-        defaults.set(i, forKey: "keySound")
+        defaults.set(i, forKey: "keySound"); defaults.set(keyPresets[i].name, forKey: "keySoundName")
         keys = keyPresets[i].sounds(); typeDemo()
     }
     func pickMouse(_ i: Int) {

@@ -49,6 +49,7 @@ curl -fsSL https://raw.githubusercontent.com/E-JIWON/tadak/main/install.sh | sh
 
 `ref/`에는 소리를 맞출 때 비교한 Freesound CC0 녹음 원본이 있어요(목록: `ref/SOURCES.txt`).
 멜로딕과 북극여우는 Box Jade 녹음을 다듬어 만든 소리예요.
+해피해킹은 녹음에서 고른 타건을 `tools/shape.js`로 다듬은 소리예요(설정은 `sounds/hhkb/SOURCE.txt`).
 
 ## 상표
 
