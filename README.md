@@ -16,7 +16,7 @@ Homebrew 없이 한 줄로 설치하려면:
 curl -fsSL https://raw.githubusercontent.com/E-JIWON/tadak/main/install.sh | sh
 ```
 
-처음 실행하면 **손쉬운 사용** 권한을 요청해요. 시스템 설정 > 개인정보 보호 및 보안 > 손쉬운 사용에서 Tadak을 켜면 돼요. 키 입력은 소리를 내는 데만 쓰고, 어떤 키를 눌렀는지 저장하거나 밖으로 보내지 않아요.
+처음 실행하면 **손쉬운 사용** 권한을 요청해요. 시스템 설정 > 개인정보 보호 및 보안 > 손쉬운 사용에서 Tadak을 켜면 돼요. 키 입력은 소리를 내는 데만 쓰고, 어떤 키를 눌렀는지 저장하거나 밖으로 보내지 않아요. 인터넷은 새 버전 확인에만 써요. 켤 때와 하루에 한 번 GitHub에 최신 버전 번호만 물어보고, 끄려면 `defaults write local.tadak checkUpdates -bool false`를 실행하세요.
 
 | | Homebrew | 한 줄 설치 |
 |---|---|---|
@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/E-JIWON/tadak/main/install.sh | sh
 | 업데이트 | `brew upgrade --cask tadak` | 같은 명령을 다시 실행 |
 | 삭제 | `brew uninstall --cask tadak` (설정까지 지우려면 `--zap`) | `/Applications/Tadak.app` 삭제 |
 
-앱이 스스로 업데이트하지는 않아요. 업데이트 뒤 소리가 안 나면 손쉬운 사용에서 Tadak을 껐다 다시 켜 주세요(새 버전마다 서명이 바뀌어서예요).
+새 버전이 나오면 메뉴 막대 아이콘에 점이 생기고, 패널의 **업데이트** 버튼이 설치 방식에 맞는 업데이트 명령을 복사해 줘요(앱이 스스로 설치하지는 않아요). 업데이트 뒤 소리가 안 나면 손쉬운 사용에서 Tadak을 껐다 다시 켜 주세요(새 버전마다 서명이 바뀌어서예요).
 
 [릴리스](https://github.com/E-JIWON/tadak/releases/latest)에서 `Tadak.zip`을 브라우저로 직접 받으면, Apple 공증을 받지 않은 앱이라 처음 열 때 macOS가 막아요. 그때는 시스템 설정 > 개인정보 보호 및 보안에서 "그래도 열기"를 누르세요.
 

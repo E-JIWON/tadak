@@ -381,6 +381,12 @@ if let i = CommandLine.arguments.firstIndex(of: "--render") {
     for (k, p) in mousePresets.enumerated() { let s = p.sounds(); write(s.down, "mouse\(k)", "down"); write(s.up, "mouse\(k)", "up") }
     exit(0)
 }
+if CommandLine.arguments.contains("--versions") {  // checks newer()
+    for (a, b, want) in [("1.2", "1.1", true), ("1.1", "1.1", false), ("1.10", "1.9", true), ("1.1.1", "1.1", true), ("1.0", "1.1", false), ("2", "1.9.9", true)] {
+        guard newer(a, than: b) == want else { print("newer(\(a), \(b)) wrong"); exit(1) }
+    }
+    print("ok: version compare"); exit(0)
+}
 if CommandLine.arguments.contains("--check") {
     let all = (keyPresets + mousePresets).map { $0.sounds() }
     for s in all {
@@ -498,6 +504,21 @@ let menuBarIcon: NSImage = {
     image.isTemplate = true
     return image
 }()
+// The same icon with a dot in the corner when a new version is out.
+let updateIcon: NSImage = {
+    let image = NSImage(size: NSSize(width: 18, height: 18), flipped: false) { r in
+        menuBarIcon.draw(in: r)
+        let dot = NSRect(x: 12, y: 12, width: 6, height: 6)
+        NSGraphicsContext.current?.compositingOperation = .clear
+        NSBezierPath(ovalIn: dot.insetBy(dx: -1.5, dy: -1.5)).fill()
+        NSGraphicsContext.current?.compositingOperation = .sourceOver
+        NSColor.black.setFill()
+        NSBezierPath(ovalIn: dot).fill()
+        return true
+    }
+    image.isTemplate = true
+    return image
+}()
 // Warning icon until Accessibility permission is granted.
 status.button?.image = NSImage(systemSymbolName: "exclamationmark.triangle", accessibilityDescription: "Tadak: 권한 필요")
 status.button?.appearsDisabled = !enabled
@@ -525,7 +546,9 @@ final class Panel: NSObject, ObservableObject {
     }
     @Published var key = keyChoice
     @Published var click = mouseChoice
-    @Published var trusted = false
+    @Published var trusted = false { didSet { refreshIcon() } }
+    @Published var update: Release? { didSet { refreshIcon() } }
+    @Published var copied = false
     var preview: DispatchWorkItem?, lastTick = Date.distantPast
 
     func pickKey(_ i: Int) {
@@ -545,6 +568,15 @@ final class Panel: NSObject, ObservableObject {
         let work = DispatchWorkItem(block: taste)
         preview = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: work)
+    }
+    // Updating is the user's own install command, copied for them: Homebrew's if Homebrew installed Tadak.
+    func updateNow() {
+        let brew = ["/opt/homebrew/Caskroom/tadak", "/usr/local/Caskroom/tadak"].contains { FileManager.default.fileExists(atPath: $0) }
+        let command = brew ? "brew upgrade --cask tadak" : "curl -fsSL https://raw.githubusercontent.com/E-JIWON/tadak/main/install.sh | sh"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(command, forType: .string)
+        NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Applications/Utilities/Terminal.app"))
+        copied = true
     }
     func openSettings() {
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
@@ -566,6 +598,11 @@ final class Panel: NSObject, ObservableObject {
     }
 }
 let panel = Panel()
+struct Release { let version: String, page: URL }
+func refreshIcon() {
+    guard panel.trusted else { return }
+    status.button?.image = panel.update == nil ? menuBarIcon : updateIcon
+}
 
 // A rounded backdrop for a sound: tinted when it's the one picked, faint under the pointer.
 struct Backdrop: ViewModifier {
@@ -629,6 +666,22 @@ struct PanelView: View {
                 Toggle("", isOn: $m.on).toggleStyle(.switch).controlSize(.small).tint(.teal).labelsHidden()
             }
             .padding(.horizontal, 8)
+            if let u = m.update {
+                VStack(alignment: .leading, spacing: 6) {
+                    Label("새 버전이 나왔어요 · \(u.version)", systemImage: "arrow.down.circle.fill")
+                        .font(.system(size: 12, weight: .medium)).foregroundStyle(.teal)
+                    HStack {
+                        Button("업데이트", action: m.updateNow)
+                        Button("바뀐 점 보기") { NSWorkspace.shared.open(u.page) }
+                    }
+                    .controlSize(.small)
+                    if m.copied {
+                        Text("업데이트 명령을 복사했어요. 터미널에 붙여 넣고 Return을 누르세요.")
+                            .font(.system(size: 11)).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(.horizontal, 8)
+            }
             if !m.trusted {
                 VStack(alignment: .leading, spacing: 6) {
                     Label("키 입력을 들으려면 손쉬운 사용 권한이 필요해요", systemImage: "exclamationmark.triangle.fill")
@@ -692,13 +745,40 @@ popover.contentViewController = panelHost
 status.button?.target = panel
 status.button?.action = #selector(Panel.toggle)
 
+// New versions: asks GitHub for the latest release at launch and then daily. That request is all Tadak sends anywhere;
+// `defaults write local.tadak checkUpdates -bool false` turns it off. TADAK_RELEASES points it elsewhere for testing.
+let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+func newer(_ a: String, than b: String) -> Bool {
+    let x = a.split(separator: ".").map { Int($0) ?? 0 }, y = b.split(separator: ".").map { Int($0) ?? 0 }
+    for i in 0..<max(x.count, y.count) where (i < x.count ? x[i] : 0) != (i < y.count ? y[i] : 0) {
+        return (i < x.count ? x[i] : 0) > (i < y.count ? y[i] : 0)
+    }
+    return false
+}
+func checkForUpdate() {
+    guard defaults.object(forKey: "checkUpdates") as? Bool ?? true, let current = appVersion else { return }
+    let source = ProcessInfo.processInfo.environment["TADAK_RELEASES"] ?? "https://api.github.com/repos/E-JIWON/tadak/releases/latest"
+    var request = URLRequest(url: URL(string: source)!)
+    request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+    URLSession.shared.dataTask(with: request) { data, _, _ in
+        guard let data, let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let tag = json["tag_name"] as? String, let page = (json["html_url"] as? String).flatMap(URL.init(string:)) else { return }
+        let latest = tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
+        DispatchQueue.main.async {
+            log.notice("latest release \(latest, privacy: .public), running \(current, privacy: .public)")
+            panel.update = newer(latest, than: current) ? Release(version: latest, page: page) : nil
+        }
+    }.resume()
+}
+DispatchQueue.main.asyncAfter(deadline: .now() + 5) { checkForUpdate() }
+Timer.scheduledTimer(withTimeInterval: 24 * 60 * 60, repeats: true) { _ in checkForUpdate() }
+
 // Global key/mouse monitoring needs Accessibility permission; poll until granted, then start listening.
 AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
 Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
     guard AXIsProcessTrusted() else { return }
     timer.invalidate()
     panel.trusted = true
-    status.button?.image = menuBarIcon
     log.notice("listening for keys and clicks")
     var heard = false
     NSEvent.addGlobalMonitorForEvents(matching: [.keyDown, .keyUp, .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp]) { e in
