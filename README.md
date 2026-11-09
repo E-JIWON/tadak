@@ -34,7 +34,7 @@ curl -fsSL https://raw.githubusercontent.com/E-JIWON/tadak/main/install.sh | sh
 
 | 키보드 | 바탕 |
 |---|---|
-| 보글 | Rainy 75 (알루미늄) |
+| 보글 | Rainy 75 (알루미늄), 뗄 때 소리는 작게 |
 | 내 키보드 | Durock T1 Silent Shrimp 67g, 윤활, 알루미늄 바디 |
 | 해피해킹 | HHKB (Topre 45g) |
 | 북극여우 | Kailh Arctic Fox |

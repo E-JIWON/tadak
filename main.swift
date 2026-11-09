@@ -332,7 +332,7 @@ func switchIcon(housing: NSColor, stem: NSColor, _ kind: Stem, wall: NSColor? = 
 }
 let rgb = { (r: CGFloat, g: CGFloat, b: CGFloat) in NSColor(srgbRed: r / 255, green: g / 255, blue: b / 255, alpha: 1) }
 let keyPresets = [
-    Preset(name: "보글", detail: "레이니75 · 알루미늄", icon: switchIcon(housing: rgb(196, 160, 185), stem: rgb(176, 130, 181), .cross)) { recorded("rainy75", eq: rainyEQ, tight: 10) },
+    Preset(name: "보글", detail: "레이니75 · 알루미늄", icon: switchIcon(housing: rgb(196, 160, 185), stem: rgb(176, 130, 181), .cross)) { recorded("rainy75", upGain: 0.25, eq: rainyEQ, tight: 10) },  // key-ups 12 dB under the recording's
     Preset(name: "내 키보드", detail: "듀록 저소음 쉬림프 67g", icon: switchIcon(housing: rgb(90, 168, 163), stem: rgb(239, 240, 240), .cross)) { shrimp() },
     Preset(name: "해피해킹", detail: "HHKB · Topre 45g", icon: switchIcon(housing: rgb(217, 213, 204), stem: rgb(32, 32, 32), .topre)) {
         // HHKB Topre 45g, shaped on the tuner page: the cushioned double impact and the case's ring trimmed, treble down.
@@ -400,11 +400,13 @@ if CommandLine.arguments.contains("--check") {
 }
 
 let defaults = UserDefaults.standard
-// The pick is saved by name, so adding sounds to the list later keeps it; version 1.0 saved only the index.
+// The pick is saved by name, so adding sounds to the list keeps it. Until a pick is made, only the index that 1.0
+// and 1.1 saved exists, and it counts in their list.
+let listBefore12 = ["보글", "내 키보드", "해피해킹", "북극여우", "Box Jade", "멜로딕"]
 var keyChoice: Int = {
-    if let name = defaults.string(forKey: "keySoundName"), let i = keyPresets.firstIndex(where: { $0.name == name }) { return i }
-    let i = defaults.integer(forKey: "keySound")
-    return keyPresets.indices.contains(i) ? i : 0
+    let old = defaults.integer(forKey: "keySound")
+    let name = defaults.string(forKey: "keySoundName") ?? (listBefore12.indices.contains(old) ? listBefore12[old] : "")
+    return keyPresets.firstIndex { $0.name == name } ?? 0
 }()
 var mouseChoice = min(defaults.object(forKey: "mouseSound") as? Int ?? 0, mousePresets.count - 1)  // -1 = off
 var keys = keyPresets[keyChoice].sounds()

@@ -6,7 +6,7 @@
 set -e
 cd "$(dirname "$0")"
 APP=Tadak.app
-VERSION=${VERSION:-1.1}  # tools/release.sh sets it
+VERSION=${VERSION:-1.2}  # tools/release.sh sets it
 rm -rf $APP && mkdir -p $APP/Contents/MacOS $APP/Contents/Resources
 compile() { swiftc -O -target "$1-apple-macos14.0" main.swift -o "$2"; }  # SwiftUI panel features need macOS 14
 if [ "$1" = release ]; then
