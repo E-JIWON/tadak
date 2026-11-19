@@ -69,4 +69,4 @@ Kailh, Gateron, Durock, Rainy 75, HHKB, Topre, Logitech, Razer, MacBook 등 제�
 
 ## 라이선스
 
-코드와 작성자가 만든 파일은 [MIT](LICENSE)예요. Freesound 녹음은 CC0예요. 아이콘(`icons/`)은 [Phosphor Icons](https://phosphoricons.com) (MIT)예요.
+코드와 작성자가 만든 파일은 [MIT](LICENSE)예요. Freesound 녹음은 CC0예요. 아이콘(`icons/`)은 [Phosphor Icons](https://phosphoricons.com) (MIT)예요. 함께 들어 있는 외부 자료와 각각의 라이선스는 [NOTICE.md](NOTICE.md)에 모아 뒀어요.

@@ -20,6 +20,7 @@ fi
 cp -R sounds/ $APP/Contents/Resources/  # recorded clips (tools/session.sh + tools/slice, tools/clicks)
 cp AppIcon.icns $APP/Contents/Resources/  # drawn by tools/icon.swift
 cp -R icons $APP/Contents/Resources/icons  # Phosphor Icons, MIT
+cp LICENSE NOTICE.md $APP/Contents/Resources/  # the licenses travel with every copy
 cat > $APP/Contents/Info.plist <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

@@ -1,0 +1,3 @@
+Source: recorded by the author (E-JIWON) on their own keyboard — Durock T1 Silent Shrimp 67g, lubed, aluminum case —
+with tools/session.sh and cut with tools/slice.
+License: MIT, like the rest of this project (see LICENSE).
