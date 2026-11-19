@@ -2,6 +2,8 @@
 
 macOS 메뉴 막대에 머물면서, 키보드를 치거나 마우스를 누를 때마다 기계식 키보드·마우스 클릭 소리를 내 주는 앱이에요.
 
+<p align="center"><img src="docs/screenshot.png" width="640" alt="메뉴 막대 아이콘을 누르면 나오는 Tadak 패널. 라이트 모드와 다크 모드"></p>
+
 ## 설치
 
 macOS 14 이상, Apple 실리콘·Intel 모두 지원해요. Homebrew가 있으면:
